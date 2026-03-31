@@ -27,25 +27,25 @@
     }
   ],
   "featureMeta": {
-    "Exchange Online (50GB)": { "category": "Почта и файлы" },
-    "Exchange Online (100GB)": { "category": "Почта и файлы", "includes": ["Exchange Online (50GB)"] },
-    "Teams": { "category": "Почта и файлы" },
-    "SharePoint Online": { "category": "Почта и файлы" },
+    "Exchange Online (50GB)": { "category": "Email & Files" },
+    "Exchange Online (100GB)": { "category": "Email & Files", "includes": ["Exchange Online (50GB)"] },
+    "Teams": { "category": "Email & Files" },
+    "SharePoint Online": { "category": "Email & Files" },
     
-    "Web Apps": { "category": "Офисные приложения" },
-    "Desktop Apps": { "category": "Офисные приложения", "includes": ["Web Apps"] },
+    "Web Apps": { "category": "Office Apps" },
+    "Desktop Apps": { "category": "Office Apps", "includes": ["Web Apps"] },
     
-    "Entra ID Plan 1": { "category": "Идентификация и Доступ" },
-    "Entra ID Plan 2": { "category": "Идентификация и Доступ", "includes": ["Entra ID Plan 1"] },
+    "Entra ID Plan 1": { "category": "Identity & Access" },
+    "Entra ID Plan 2": { "category": "Identity & Access", "includes": ["Entra ID Plan 1"] },
     
-    "Defender for Business": { "category": "Безопасность (Security)" },
-    "Defender for Endpoint Plan 2": { "category": "Безопасность (Security)", "includes": ["Defender for Business"] },
-    "Information Protection": { "category": "Безопасность (Security)" },
+    "Defender for Business": { "category": "Security" },
+    "Defender for Endpoint Plan 2": { "category": "Security", "includes": ["Defender for Business"] },
+    "Information Protection": { "category": "Security" },
     
-    "Microsoft Intune": { "category": "Управление устройствами" },
-    "Windows 11 Enterprise E3": { "category": "Управление устройствами" },
-    "Windows 11 Enterprise E5": { "category": "Управление устройствами", "includes": ["Windows 11 Enterprise E3"] },
+    "Microsoft Intune": { "category": "Device Management" },
+    "Windows 11 Enterprise E3": { "category": "Device Management" },
+    "Windows 11 Enterprise E5": { "category": "Device Management", "includes": ["Windows 11 Enterprise E3"] },
     
-    "Purview Audit (Premium)": { "category": "Аналитика и Compliance" }
+    "Purview Audit (Premium)": { "category": "Analytics & Compliance" }
   }
 }
