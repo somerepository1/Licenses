@@ -1,27 +1,51 @@
-[
+{
+  "plans": [
     {
-        "name": "Microsoft 365 Business Basic",
-        "price": 6.00,
-        "features": ["Exchange Online (50GB)", "Teams", "SharePoint Online", "Web Apps (Word, Excel)"]
+      "name": "Microsoft 365 Business Basic",
+      "price": 6.00,
+      "features": ["Exchange Online (50GB)", "Teams", "SharePoint Online", "Web Apps"]
     },
     {
-        "name": "Microsoft 365 Business Standard",
-        "price": 12.50,
-        "features": ["Exchange Online (50GB)", "Teams", "SharePoint Online", "Web Apps (Word, Excel)", "Desktop Apps (Word, Excel, PowerPoint)"]
+      "name": "Microsoft 365 Business Standard",
+      "price": 12.50,
+      "features": ["Exchange Online (50GB)", "Teams", "SharePoint Online", "Web Apps", "Desktop Apps"]
     },
     {
-        "name": "Microsoft 365 Business Premium",
-        "price": 22.00,
-        "features": ["Exchange Online (50GB)", "Teams", "SharePoint Online", "Web Apps (Word, Excel)", "Desktop Apps (Word, Excel, PowerPoint)", "Microsoft Intune", "Entra ID Plan 1", "Defender for Business", "Information Protection"]
+      "name": "Microsoft 365 Business Premium",
+      "price": 22.00,
+      "features": ["Exchange Online (50GB)", "Teams", "SharePoint Online", "Web Apps", "Desktop Apps", "Microsoft Intune", "Entra ID Plan 1", "Defender for Business", "Information Protection"]
     },
     {
-        "name": "Microsoft 365 E3",
-        "price": 36.00,
-        "features": ["Exchange Online (100GB)", "Teams", "SharePoint Online", "Web Apps (Word, Excel)", "Desktop Apps (Word, Excel, PowerPoint)", "Microsoft Intune", "Entra ID Plan 1", "Windows 11 Enterprise E3", "Information Protection"]
+      "name": "Microsoft 365 E3",
+      "price": 36.00,
+      "features": ["Exchange Online (100GB)", "Teams", "SharePoint Online", "Web Apps", "Desktop Apps", "Microsoft Intune", "Entra ID Plan 1", "Windows 11 Enterprise E3", "Information Protection"]
     },
     {
-        "name": "Microsoft 365 E5",
-        "price": 57.00,
-        "features": ["Exchange Online (100GB)", "Teams", "SharePoint Online", "Web Apps (Word, Excel)", "Desktop Apps (Word, Excel, PowerPoint)", "Microsoft Intune", "Entra ID Plan 2", "Windows 11 Enterprise E5", "Information Protection", "Defender for Endpoint Plan 2", "Defender for Office 365 Plan 2", "Purview Audit (Premium)", "Power BI Pro"]
+      "name": "Microsoft 365 E5",
+      "price": 57.00,
+      "features": ["Exchange Online (100GB)", "Teams", "SharePoint Online", "Web Apps", "Desktop Apps", "Microsoft Intune", "Entra ID Plan 2", "Windows 11 Enterprise E5", "Information Protection", "Defender for Endpoint Plan 2", "Purview Audit (Premium)"]
     }
-]
+  ],
+  "featureMeta": {
+    "Exchange Online (50GB)": { "category": "Почта и файлы" },
+    "Exchange Online (100GB)": { "category": "Почта и файлы", "includes": ["Exchange Online (50GB)"] },
+    "Teams": { "category": "Почта и файлы" },
+    "SharePoint Online": { "category": "Почта и файлы" },
+    
+    "Web Apps": { "category": "Офисные приложения" },
+    "Desktop Apps": { "category": "Офисные приложения", "includes": ["Web Apps"] },
+    
+    "Entra ID Plan 1": { "category": "Идентификация и Доступ" },
+    "Entra ID Plan 2": { "category": "Идентификация и Доступ", "includes": ["Entra ID Plan 1"] },
+    
+    "Defender for Business": { "category": "Безопасность (Security)" },
+    "Defender for Endpoint Plan 2": { "category": "Безопасность (Security)", "includes": ["Defender for Business"] },
+    "Information Protection": { "category": "Безопасность (Security)" },
+    
+    "Microsoft Intune": { "category": "Управление устройствами" },
+    "Windows 11 Enterprise E3": { "category": "Управление устройствами" },
+    "Windows 11 Enterprise E5": { "category": "Управление устройствами", "includes": ["Windows 11 Enterprise E3"] },
+    
+    "Purview Audit (Premium)": { "category": "Аналитика и Compliance" }
+  }
+}
