@@ -3,77 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M365 License Finder & Calculator</title>
+    <title>M365 License Finder</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
 
 <div class="max-w-4xl mx-auto py-10 px-5">
     <h1 class="text-3xl font-bold text-blue-600 mb-2">M365 License Finder</h1>
-    <p class="text-gray-600 mb-8">Выберите необходимые функции, и мы подберем оптимальный тариф и рассчитаем стоимость.</p>
+    <p class="text-gray-600 mb-8">Выберите необходимые функции, и мы подберем оптимальный тариф.</p>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="md:col-span-2 bg-white p-6 rounded-lg shadow">
             <h2 class="text-xl font-semibold mb-4 border-b pb-2">1. Выберите функции</h2>
-            <div id="features-list" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+            <div id="loading-message" class="text-gray-500 italic">Загрузка базы данных...</div>
+            <div id="features-list" class="space-y-3 max-h-96 overflow-y-auto pr-2 hidden">
                 </div>
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow h-fit sticky top-5">
             <h2 class="text-xl font-semibold mb-4 border-b pb-2">2. Калькулятор</h2>
             
-            <label class="block text-sm font-medium text-gray-700 mb-1">Количество пользователей (Seats):</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Количество пользователей:</label>
             <input type="number" id="seats-input" value="10" min="1" class="w-full border border-gray-300 rounded-md p-2 mb-6 focus:ring-blue-500 focus:border-blue-500">
 
             <h3 class="text-lg font-semibold text-gray-800 mb-3">Подходящие планы:</h3>
             <div id="results-area" class="space-y-4">
-                <p class="text-sm text-gray-500 italic">Выберите хотя бы одну функцию слева...</p>
+                <p class="text-sm text-gray-500 italic">Выберите функции слева...</p>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // 1. Наша база данных (Тарифы, Цены и включенные функции)
-    const m365Data = [
-        {
-            name: "Microsoft 365 Business Basic",
-            price: 6.00,
-            features: ["Exchange Online (50GB)", "Teams", "SharePoint Online", "Web Apps (Word, Excel)"]
-        },
-        {
-            name: "Microsoft 365 Business Standard",
-            price: 12.50,
-            features: ["Exchange Online (50GB)", "Teams", "SharePoint Online", "Web Apps (Word, Excel)", "Desktop Apps (Word, Excel, PowerPoint)"]
-        },
-        {
-            name: "Microsoft 365 Business Premium",
-            price: 22.00,
-            features: ["Exchange Online (50GB)", "Teams", "SharePoint Online", "Web Apps (Word, Excel)", "Desktop Apps (Word, Excel, PowerPoint)", "Microsoft Intune", "Entra ID Plan 1", "Defender for Business", "Information Protection"]
-        },
-        {
-            name: "Microsoft 365 E3",
-            price: 36.00,
-            features: ["Exchange Online (100GB)", "Teams", "SharePoint Online", "Web Apps (Word, Excel)", "Desktop Apps (Word, Excel, PowerPoint)", "Microsoft Intune", "Entra ID Plan 1", "Windows 11 Enterprise E3", "Information Protection"]
-        },
-        {
-            name: "Microsoft 365 E5",
-            price: 57.00,
-            features: ["Exchange Online (100GB)", "Teams", "SharePoint Online", "Web Apps (Word, Excel)", "Desktop Apps (Word, Excel, PowerPoint)", "Microsoft Intune", "Entra ID Plan 2", "Windows 11 Enterprise E5", "Information Protection", "Defender for Endpoint Plan 2", "Defender for Office 365 Plan 2", "Purview Audit (Premium)", "Power BI Pro"]
-        }
-    ];
+    let m365Data = [];
+    let allFeatures = [];
+    let selectedFeatures = [];
 
-    // 2. Извлекаем уникальный список всех функций для отрисовки интерфейса
-    const allFeatures = [...new Set(m365Data.flatMap(plan => plan.features))].sort();
-
-    // DOM Элементы
     const featuresListDiv = document.getElementById('features-list');
+    const loadingMessage = document.getElementById('loading-message');
     const seatsInput = document.getElementById('seats-input');
     const resultsArea = document.getElementById('results-area');
 
-    let selectedFeatures = [];
+    // 1. Асинхронная загрузка данных из отдельного файла
+    async function loadData() {
+        try {
+            const response = await fetch('data.json');
+            if (!response.ok) throw new Error('Сетевая ошибка');
+            
+            m365Data = await response.json();
+            
+            // Вытаскиваем уникальные функции и сортируем по алфавиту
+            allFeatures = [...new Set(m365Data.flatMap(plan => plan.features))].sort();
+            
+            // Прячем надпись "Загрузка" и показываем список
+            loadingMessage.classList.add('hidden');
+            featuresListDiv.classList.remove('hidden');
+            
+            renderCheckboxes();
+        } catch (error) {
+            console.error("Ошибка загрузки:", error);
+            loadingMessage.innerHTML = '<span class="text-red-500">Ошибка: Не удалось загрузить data.json. Убедитесь, что файл существует.</span>';
+        }
+    }
 
-    // 3. Отрисовка чекбоксов
+    // 2. Отрисовка чекбоксов
     function renderCheckboxes() {
         allFeatures.forEach(feature => {
             const label = document.createElement('label');
@@ -103,44 +96,35 @@
         });
     }
 
-    // 4. Логика подбора тарифов и расчета цен
+    // 3. Расчет планов
     function calculatePlans() {
         const seats = parseInt(seatsInput.value) || 0;
 
-        // Если ничего не выбрано
         if (selectedFeatures.length === 0) {
-            resultsArea.innerHTML = '<p class="text-sm text-gray-500 italic">Выберите хотя бы одну функцию слева...</p>';
+            resultsArea.innerHTML = '<p class="text-sm text-gray-500 italic">Выберите функции слева...</p>';
             return;
         }
 
-        // Ищем планы, которые содержат ВСЕ выбранные функции
         let matchingPlans = m365Data.filter(plan => {
             return selectedFeatures.every(feature => plan.features.includes(feature));
         });
 
-        // Сортируем по цене (от дешевого к дорогому)
         matchingPlans.sort((a, b) => a.price - b.price);
-
-        // Отрисовываем результаты
         resultsArea.innerHTML = '';
 
         if (matchingPlans.length === 0) {
             resultsArea.innerHTML = `
                 <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                    <p class="text-sm text-red-700 font-medium">Нет единого плана, включающего все выбранные функции.</p>
-                    <p class="text-xs text-red-600 mt-1">Возможно, вам потребуются Add-on лицензии.</p>
+                    <p class="text-sm text-red-700 font-medium">Нет единого плана для всех выбранных функций.</p>
                 </div>`;
             return;
         }
 
         matchingPlans.forEach((plan, index) => {
             const monthlyTotal = (plan.price * seats).toFixed(2);
-            const annualTotal = (plan.price * seats * 12).toFixed(2);
-            
-            // Выделяем самый дешевый подходящий план
             const isBestValue = index === 0; 
             const borderClass = isBestValue ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50';
-            const badge = isBestValue ? '<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded ml-2">Оптимальный</span>' : '';
+            const badge = isBestValue ? '<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded ml-2">Оптимальный</span>' : '';
 
             const planCard = document.createElement('div');
             planCard.className = `border-2 p-4 rounded-lg ${borderClass}`;
@@ -148,27 +132,20 @@
                 <div class="flex justify-between items-center mb-2">
                     <h4 class="font-bold text-gray-800">${plan.name} ${badge}</h4>
                 </div>
-                <div class="text-sm text-gray-600 mb-3">Цена за юзера: $${plan.price.toFixed(2)}/мес</div>
-                <div class="bg-white p-3 rounded border border-gray-100">
-                    <div class="flex justify-between items-center text-sm mb-1">
-                        <span class="text-gray-500">Итого в месяц (${seats} шт):</span>
-                        <span class="font-bold text-gray-800">$${monthlyTotal}</span>
-                    </div>
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-gray-500">Итого в год:</span>
-                        <span class="font-bold text-gray-800">$${annualTotal}</span>
-                    </div>
+                <div class="text-sm text-gray-600 mb-2">Цена: $${plan.price.toFixed(2)}/мес</div>
+                <div class="bg-white p-2 rounded border border-gray-100 flex justify-between text-sm">
+                    <span class="text-gray-500">Итого (${seats} шт):</span>
+                    <span class="font-bold text-gray-800">$${monthlyTotal}/мес</span>
                 </div>
             `;
             resultsArea.appendChild(planCard);
         });
     }
 
-    // Слушатель для инпута с количеством ситов
     seatsInput.addEventListener('input', calculatePlans);
-
-    // Инициализация при загрузке
-    renderCheckboxes();
+    
+    // Запускаем загрузку данных при открытии страницы
+    loadData();
 </script>
 
 </body>
