@@ -8,22 +8,23 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
 
-<div class="max-w-4xl mx-auto py-10 px-5">
+<div class="max-w-5xl mx-auto py-10 px-5">
     <h1 class="text-3xl font-bold text-blue-600 mb-2">M365 License Finder</h1>
-    <p class="text-gray-600 mb-8">Выберите необходимые функции, и мы подберем оптимальный тариф.</p>
+    <p class="text-gray-600 mb-8">Выберите функции, и мы подберем оптимальный тариф с учетом иерархии лицензий.</p>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="md:col-span-2 bg-white p-6 rounded-lg shadow">
-            <h2 class="text-xl font-semibold mb-4 border-b pb-2">1. Выберите функции</h2>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2">1. Выберите необходимые сервисы</h2>
             <div id="loading-message" class="text-gray-500 italic">Загрузка базы данных...</div>
-            <div id="features-list" class="space-y-3 max-h-96 overflow-y-auto pr-2 hidden">
+            
+            <div id="categories-container" class="space-y-6 hidden">
                 </div>
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow h-fit sticky top-5">
             <h2 class="text-xl font-semibold mb-4 border-b pb-2">2. Калькулятор</h2>
             
-            <label class="block text-sm font-medium text-gray-700 mb-1">Количество пользователей:</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Количество сотрудников (Seats):</label>
             <input type="number" id="seats-input" value="10" min="1" class="w-full border border-gray-300 rounded-md p-2 mb-6 focus:ring-blue-500 focus:border-blue-500">
 
             <h3 class="text-lg font-semibold text-gray-800 mb-3">Подходящие планы:</h3>
@@ -35,68 +36,139 @@
 </div>
 
 <script>
-    let m365Data = [];
-    let allFeatures = [];
+    let plansData = [];
+    let featureMeta = {};
     let selectedFeatures = [];
 
-    const featuresListDiv = document.getElementById('features-list');
+    const categoriesContainer = document.getElementById('categories-container');
     const loadingMessage = document.getElementById('loading-message');
     const seatsInput = document.getElementById('seats-input');
     const resultsArea = document.getElementById('results-area');
 
-    // 1. Асинхронная загрузка данных из отдельного файла
     async function loadData() {
         try {
             const response = await fetch('data.json');
-            if (!response.ok) throw new Error('Сетевая ошибка');
+            if (!response.ok) throw new Error('Ошибка сети');
             
-            m365Data = await response.json();
+            const data = await response.json();
+            plansData = data.plans;
+            featureMeta = data.featureMeta;
             
-            // Вытаскиваем уникальные функции и сортируем по алфавиту
-            allFeatures = [...new Set(m365Data.flatMap(plan => plan.features))].sort();
-            
-            // Прячем надпись "Загрузка" и показываем список
             loadingMessage.classList.add('hidden');
-            featuresListDiv.classList.remove('hidden');
+            categoriesContainer.classList.remove('hidden');
             
-            renderCheckboxes();
+            renderCategories();
         } catch (error) {
             console.error("Ошибка загрузки:", error);
-            loadingMessage.innerHTML = '<span class="text-red-500">Ошибка: Не удалось загрузить data.json. Убедитесь, что файл существует.</span>';
+            loadingMessage.innerHTML = '<span class="text-red-500">Ошибка: Не удалось загрузить data.json. Убедитесь, что файл лежит рядом с index.html.</span>';
         }
     }
 
-    // 2. Отрисовка чекбоксов
-    function renderCheckboxes() {
-        allFeatures.forEach(feature => {
-            const label = document.createElement('label');
-            label.className = "flex items-center space-x-3 cursor-pointer p-2 hover:bg-gray-50 rounded transition-colors";
+    function renderCategories() {
+        // Группируем функции по категориям
+        const categories = {};
+        
+        Object.keys(featureMeta).forEach(featureName => {
+            const cat = featureMeta[featureName].category || "Прочее";
+            if (!categories[cat]) categories[cat] = [];
+            categories[cat].push(featureName);
+        });
+
+        // Отрисовываем блоки
+        for (const [categoryName, features] of Object.entries(categories)) {
+            const block = document.createElement('div');
+            block.className = "bg-gray-50 p-4 rounded-lg border border-gray-100";
             
-            const checkbox = document.createElement('input');
-            checkbox.type = "checkbox";
-            checkbox.value = feature;
-            checkbox.className = "form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500";
-            
-            checkbox.addEventListener('change', (e) => {
-                if(e.target.checked) {
-                    selectedFeatures.push(e.target.value);
-                } else {
-                    selectedFeatures = selectedFeatures.filter(f => f !== e.target.value);
-                }
-                calculatePlans();
+            const title = document.createElement('h3');
+            title.className = "font-bold text-gray-700 mb-3";
+            title.innerText = categoryName;
+            block.appendChild(title);
+
+            const grid = document.createElement('div');
+            grid.className = "grid grid-cols-1 md:grid-cols-2 gap-2";
+
+            features.sort().forEach(feature => {
+                const label = document.createElement('label');
+                label.className = "flex items-start space-x-3 cursor-pointer p-2 hover:bg-white rounded transition-colors border border-transparent hover:border-gray-200 feature-label";
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = "checkbox";
+                checkbox.value = feature;
+                checkbox.className = "form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 mt-0.5 focus:ring-blue-500 feature-checkbox";
+                
+                checkbox.addEventListener('change', (e) => {
+                    handleSelection(e.target.value, e.target.checked);
+                });
+
+                const textContainer = document.createElement('div');
+                const spanMain = document.createElement('span');
+                spanMain.className = "text-gray-800 text-sm font-medium block";
+                spanMain.innerText = feature;
+                
+                const spanSub = document.createElement('span');
+                spanSub.className = "text-xs text-gray-500 hidden included-hint";
+                spanSub.innerText = "Включено в старший план";
+
+                textContainer.appendChild(spanMain);
+                textContainer.appendChild(spanSub);
+                
+                label.appendChild(checkbox);
+                label.appendChild(textContainer);
+                grid.appendChild(label);
             });
 
-            const span = document.createElement('span');
-            span.className = "text-gray-700";
-            span.innerText = feature;
+            block.appendChild(grid);
+            categoriesContainer.appendChild(block);
+        }
+    }
 
-            label.appendChild(checkbox);
-            label.appendChild(span);
-            featuresListDiv.appendChild(label);
+    function handleSelection(featureValue, isChecked) {
+        if (isChecked) {
+            selectedFeatures.push(featureValue);
+        } else {
+            selectedFeatures = selectedFeatures.filter(f => f !== featureValue);
+        }
+        
+        updateLocks();
+        calculatePlans();
+    }
+
+    // Функция блокировки младших планов
+    function updateLocks() {
+        // Сначала сбрасываем все блокировки
+        document.querySelectorAll('.feature-checkbox').forEach(cb => {
+            cb.disabled = false;
+            const label = cb.closest('label');
+            label.classList.remove('opacity-50', 'bg-gray-200');
+            label.querySelector('.included-hint').classList.add('hidden');
+        });
+
+        // Собираем список функций, которые нужно заблокировать (поглощенные)
+        let lockedFeatures = new Set();
+        selectedFeatures.forEach(sf => {
+            if (featureMeta[sf] && featureMeta[sf].includes) {
+                featureMeta[sf].includes.forEach(inc => lockedFeatures.add(inc));
+            }
+        });
+
+        // Применяем блокировки
+        lockedFeatures.forEach(lf => {
+            const cb = document.querySelector(`input[value="${lf}"]`);
+            if (cb) {
+                cb.checked = false; // Снимаем галочку, если стояла
+                cb.disabled = true; // Блокируем
+                
+                // Визуально гасим элемент
+                const label = cb.closest('label');
+                label.classList.add('opacity-50', 'bg-gray-200');
+                label.querySelector('.included-hint').classList.remove('hidden');
+                
+                // Удаляем из списка выбранных (если была выбрана ранее)
+                selectedFeatures = selectedFeatures.filter(f => f !== lf);
+            }
         });
     }
 
-    // 3. Расчет планов
     function calculatePlans() {
         const seats = parseInt(seatsInput.value) || 0;
 
@@ -105,7 +177,7 @@
             return;
         }
 
-        let matchingPlans = m365Data.filter(plan => {
+        let matchingPlans = plansData.filter(plan => {
             return selectedFeatures.every(feature => plan.features.includes(feature));
         });
 
@@ -115,13 +187,14 @@
         if (matchingPlans.length === 0) {
             resultsArea.innerHTML = `
                 <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                    <p class="text-sm text-red-700 font-medium">Нет единого плана для всех выбранных функций.</p>
+                    <p class="text-sm text-red-700 font-medium">Нет единого плана, включающего все выбранные функции.</p>
                 </div>`;
             return;
         }
 
         matchingPlans.forEach((plan, index) => {
             const monthlyTotal = (plan.price * seats).toFixed(2);
+            const annualTotal = (plan.price * seats * 12).toFixed(2);
             const isBestValue = index === 0; 
             const borderClass = isBestValue ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50';
             const badge = isBestValue ? '<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded ml-2">Оптимальный</span>' : '';
@@ -132,10 +205,16 @@
                 <div class="flex justify-between items-center mb-2">
                     <h4 class="font-bold text-gray-800">${plan.name} ${badge}</h4>
                 </div>
-                <div class="text-sm text-gray-600 mb-2">Цена: $${plan.price.toFixed(2)}/мес</div>
-                <div class="bg-white p-2 rounded border border-gray-100 flex justify-between text-sm">
-                    <span class="text-gray-500">Итого (${seats} шт):</span>
-                    <span class="font-bold text-gray-800">$${monthlyTotal}/мес</span>
+                <div class="text-sm text-gray-600 mb-2">Цена за юзера: $${plan.price.toFixed(2)}/мес</div>
+                <div class="bg-white p-2 rounded border border-gray-100">
+                    <div class="flex justify-between items-center text-sm mb-1">
+                        <span class="text-gray-500">Итого в месяц (${seats} шт):</span>
+                        <span class="font-bold text-gray-800">$${monthlyTotal}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-500">Итого в год:</span>
+                        <span class="font-bold text-gray-800">$${annualTotal}</span>
+                    </div>
                 </div>
             `;
             resultsArea.appendChild(planCard);
@@ -143,8 +222,6 @@
     }
 
     seatsInput.addEventListener('input', calculatePlans);
-    
-    // Запускаем загрузку данных при открытии страницы
     loadData();
 </script>
 
