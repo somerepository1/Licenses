@@ -1,5 +1,4 @@
 const DB = {
-    // 1. БАЗОВЫЕ ПЛАНЫ И ИХ ВОЗМОЖНОСТИ (ОБНОВЛЕНО ПОД НОВЫЕ ID)
     plans: [
         { 
             name: "M365 Business Premium", 
@@ -11,7 +10,8 @@ const DB = {
                 "mde_p1_core", 
                 "mdo_p1_safe", 
                 "purview_mip_labels", 
-                "intune_p1_core"
+                "intune_p1_core",
+                "mda_discovery" // Базовый Cloud Discovery включен
             ] 
         },
         { 
@@ -23,7 +23,8 @@ const DB = {
                 "entra_p1_ca", "entra_p1_passprot", 
                 "mde_p1_core", 
                 "purview_mip_labels", 
-                "intune_p1_core"
+                "intune_p1_core",
+                "mda_discovery" // Базовый Cloud Discovery включен
             ] 
         },
         { 
@@ -35,15 +36,14 @@ const DB = {
                 "entra_p1_ca", "entra_p1_passprot", "entra_p2_pim", "entra_p2_idprot",
                 "mde_p1_core", "mde_p2_edr", "mde_p2_air", "mde_p2_tvm",
                 "mdo_p1_safe", "mdo_p2_explorer", "mdo_p2_sim",
-                "mda_casb", 
-                "mdi_core", 
+                "mda_discovery", "mda_casb", // Включает полный CASB
+                "mdi_core", // Включает Defender for Identity
                 "purview_mip_labels", "purview_dlp", 
                 "intune_p1_core"
             ] 
         }
     ],
 
-    // 2. АДДОНЫ ДЛЯ ЗАКРЫТИЯ ПРОБЕЛОВ В ЛИЦЕНЗИРОВАНИИ
     addons: [
         { id: "addon_entra_p2", name: "Entra ID P2", price: 9.00, provides: "entra_p2_idprot" },
         { id: "addon_entra_p2_pim", name: "Entra ID P2 (PIM)", price: 9.00, provides: "entra_p2_pim" },
@@ -58,7 +58,6 @@ const DB = {
         { id: "addon_intune_suite", name: "Intune Suite", price: 10.00, provides: "intune_suite_epm" }
     ],
 
-    // 3. БАЗА ДАННЫХ ФИЧЕЙ ИЗ EXCEL ТАБЛИЦЫ
     featureCategories: {
         "Identity & Access (Entra)": {
             left: {
@@ -140,18 +139,18 @@ const DB = {
             }
         },
 
-        "Cloud & Infrastructure Security": {
+        "Cloud App & AD Security": {
             left: {
-                title: "Cloud & App Security",
+                title: "App Security (Basic)",
                 features: [
-                    { id: "mda_casb", name: "Cloud App Security Broker (CASB)", desc: "Shadow IT discovery, session control for cloud apps, and SaaS DLP.", requires: "mda_casb", learn: "https://learn.microsoft.com/en-us/defender-cloud-apps/what-is-defender-for-cloud-apps" },
-                    { id: "mdi_core", name: "Active Directory Threat Protection", desc: "Protect on-premises AD against advanced attacks (Pass-the-Hash, Golden Ticket).", requires: "mdi_core", learn: "https://learn.microsoft.com/en-us/defender-for-identity/what-is" }
+                    { id: "mda_discovery", name: "Cloud App Discovery", desc: "Discover Shadow IT and analyze cloud app usage across the organization.", requires: "mda_discovery", learn: "https://learn.microsoft.com/en-us/defender-cloud-apps/set-up-cloud-discovery" }
                 ]
             },
             right: {
-                title: "Security Operations",
+                title: "SaaS & AD Security (Advanced)",
                 features: [
-                    { id: "sentinel_siem", name: "Microsoft Sentinel", desc: "Cloud-native SIEM & SOAR. Ingest logs and automate response via Playbooks.", requires: "sentinel_siem", learn: "https://learn.microsoft.com/en-us/azure/sentinel/overview" }
+                    { id: "mda_casb", name: "SaaS Security (CASB)", desc: "Session control for cloud apps, SaaS DLP, and advanced app governance.", requires: "mda_casb", learn: "https://learn.microsoft.com/en-us/defender-cloud-apps/what-is-defender-for-cloud-apps", includes: ["mda_discovery"] },
+                    { id: "mdi_core", name: "AD Threat Protection (MDI)", desc: "Protect on-premises AD against advanced attacks (Pass-the-Hash, Golden Ticket).", requires: "mdi_core", learn: "https://learn.microsoft.com/en-us/defender-for-identity/what-is" }
                 ]
             }
         }
