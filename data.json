@@ -27,25 +27,75 @@
     }
   ],
   "featureMeta": {
-    "Exchange Online (50GB)": { "category": "Email & Files" },
-    "Exchange Online (100GB)": { "category": "Email & Files", "includes": ["Exchange Online (50GB)"] },
-    "Teams": { "category": "Email & Files" },
-    "SharePoint Online": { "category": "Email & Files" },
+    "Exchange Online (50GB)": { 
+      "category": "Email & Files",
+      "description": "50GB mailbox, custom domain, calendar"
+    },
+    "Exchange Online (100GB)": { 
+      "category": "Email & Files", 
+      "includes": ["Exchange Online (50GB)"],
+      "description": "100GB mailbox, unlimited auto-expanding archiving"
+    },
+    "Teams": { 
+      "category": "Email & Files",
+      "description": "Chat, meetings (up to 300 users), file sharing"
+    },
+    "SharePoint Online": { 
+      "category": "Email & Files",
+      "description": "1TB base storage per organization, intranets"
+    },
     
-    "Web Apps": { "category": "Office Apps" },
-    "Desktop Apps": { "category": "Office Apps", "includes": ["Web Apps"] },
+    "Web Apps": { 
+      "category": "Office Apps",
+      "description": "Word, Excel, PowerPoint directly in the browser"
+    },
+    "Desktop Apps": { 
+      "category": "Office Apps", 
+      "includes": ["Web Apps"],
+      "description": "Installable offline apps for PC/Mac (up to 5 devices per user)"
+    },
     
-    "Entra ID Plan 1": { "category": "Identity & Access" },
-    "Entra ID Plan 2": { "category": "Identity & Access", "includes": ["Entra ID Plan 1"] },
+    "Entra ID Plan 1": { 
+      "category": "Identity & Access",
+      "description": "SSO, Multi-Factor Authentication (MFA), Conditional Access"
+    },
+    "Entra ID Plan 2": { 
+      "category": "Identity & Access", 
+      "includes": ["Entra ID Plan 1"],
+      "description": "Plan 1 + Identity Protection (Risk-based policies), Privileged Identity Management (PIM)"
+    },
     
-    "Defender for Business": { "category": "Security" },
-    "Defender for Endpoint Plan 2": { "category": "Security", "includes": ["Defender for Business"] },
-    "Information Protection": { "category": "Security" },
+    "Defender for Business": { 
+      "category": "Security",
+      "description": "Next-gen antivirus, Endpoint Detection & Response (EDR) for SMBs"
+    },
+    "Defender for Endpoint Plan 2": { 
+      "category": "Security", 
+      "includes": ["Defender for Business"],
+      "description": "Enterprise-grade EDR, automated investigation & remediation, Threat Analytics"
+    },
+    "Information Protection": { 
+      "category": "Security",
+      "description": "Data Loss Prevention (DLP), sensitivity labels for emails/files"
+    },
     
-    "Microsoft Intune": { "category": "Device Management" },
-    "Windows 11 Enterprise E3": { "category": "Device Management" },
-    "Windows 11 Enterprise E5": { "category": "Device Management", "includes": ["Windows 11 Enterprise E3"] },
+    "Microsoft Intune": { 
+      "category": "Device Management",
+      "description": "MDM/MAM for Windows, macOS, iOS, Android devices"
+    },
+    "Windows 11 Enterprise E3": { 
+      "category": "Device Management",
+      "description": "OS upgrade rights, Universal Print, Credential Guard"
+    },
+    "Windows 11 Enterprise E5": { 
+      "category": "Device Management", 
+      "includes": ["Windows 11 Enterprise E3"],
+      "description": "E3 + Defender for Endpoint integration"
+    },
     
-    "Purview Audit (Premium)": { "category": "Analytics & Compliance" }
+    "Purview Audit (Premium)": { 
+      "category": "Analytics & Compliance",
+      "description": "1-year audit log retention, advanced forensics, high-value audit events"
+    }
   }
 }
