@@ -1,0 +1,175 @@
+{
+  "plans": [
+    {
+      "name": "Microsoft 365 Business Basic",
+      "tier": "business",
+      "price": 6.00,
+      "maxSeats": 300,
+      "sla": 99.9,
+      "features": ["Exchange Online (50GB)", "Teams", "SharePoint Online", "Web Apps"],
+      "compliance": ["ISO 27001", "SOC 1", "SOC 2", "GDPR"],
+      "securityScore": 2,
+      "notes": "Best for small teams needing core collaboration only."
+    },
+    {
+      "name": "Microsoft 365 Business Standard",
+      "tier": "business",
+      "price": 12.50,
+      "maxSeats": 300,
+      "sla": 99.9,
+      "features": ["Exchange Online (50GB)", "Teams", "SharePoint Online", "Web Apps", "Desktop Apps"],
+      "compliance": ["ISO 27001", "SOC 1", "SOC 2", "GDPR"],
+      "securityScore": 3,
+      "notes": "Adds desktop Office apps. Still limited security controls."
+    },
+    {
+      "name": "Microsoft 365 Business Premium",
+      "tier": "business",
+      "price": 22.00,
+      "maxSeats": 300,
+      "sla": 99.9,
+      "features": ["Exchange Online (50GB)", "Teams", "SharePoint Online", "Web Apps", "Desktop Apps", "Microsoft Intune", "Entra ID Plan 1", "Defender for Business", "Information Protection"],
+      "compliance": ["ISO 27001", "SOC 1", "SOC 2", "GDPR", "HIPAA eligible"],
+      "securityScore": 6,
+      "notes": "Recommended security baseline for SMBs under 300 users."
+    },
+    {
+      "name": "Microsoft 365 E3",
+      "tier": "enterprise",
+      "price": 36.00,
+      "maxSeats": null,
+      "sla": 99.9,
+      "features": ["Exchange Online (100GB)", "Teams", "SharePoint Online", "Web Apps", "Desktop Apps", "Microsoft Intune", "Entra ID Plan 1", "Windows 11 Enterprise E3", "Information Protection"],
+      "compliance": ["ISO 27001", "SOC 1", "SOC 2", "GDPR", "HIPAA eligible", "FedRAMP Moderate", "FERPA"],
+      "securityScore": 7,
+      "notes": "Enterprise baseline. No seat limit. Windows SA rights included."
+    },
+    {
+      "name": "Microsoft 365 E5",
+      "tier": "enterprise",
+      "price": 57.00,
+      "maxSeats": null,
+      "sla": 99.9,
+      "features": ["Exchange Online (100GB)", "Teams", "SharePoint Online", "Web Apps", "Desktop Apps", "Microsoft Intune", "Entra ID Plan 2", "Windows 11 Enterprise E5", "Information Protection", "Defender for Endpoint Plan 2", "Purview Audit (Premium)", "Defender for Identity", "Microsoft Sentinel (basic)", "Phone System"],
+      "compliance": ["ISO 27001", "SOC 1", "SOC 2", "GDPR", "HIPAA eligible", "FedRAMP High", "FERPA", "ITAR eligible", "NIS2 aligned"],
+      "securityScore": 10,
+      "notes": "Maximum security posture. Recommended for regulated industries and large enterprises."
+    }
+  ],
+  "addons": [
+    {
+      "name": "Defender for Identity",
+      "price": 5.50,
+      "description": "Detect & investigate AD/hybrid identity attacks, lateral movement",
+      "category": "Security Add-ons",
+      "requiredPlan": "E3"
+    },
+    {
+      "name": "Microsoft Sentinel (SIEM)",
+      "price": 2.46,
+      "description": "Cloud-native SIEM/SOAR. Price per GB ingested (avg user ~2GB/mo)",
+      "category": "Security Add-ons",
+      "requiredPlan": null
+    },
+    {
+      "name": "Purview Compliance Manager P2",
+      "price": 10.00,
+      "description": "Advanced eDiscovery, Communication Compliance, Insider Risk Management",
+      "category": "Compliance Add-ons",
+      "requiredPlan": "E3"
+    },
+    {
+      "name": "Entra ID Governance",
+      "price": 7.00,
+      "description": "Access reviews, entitlement management, lifecycle workflows",
+      "category": "Identity Add-ons",
+      "requiredPlan": null
+    },
+    {
+      "name": "Microsoft Copilot for M365",
+      "price": 30.00,
+      "description": "AI assistant across Teams, Outlook, Word, Excel, PowerPoint",
+      "category": "Productivity Add-ons",
+      "requiredPlan": "Business Standard"
+    }
+  ],
+  "featureMeta": {
+    "Exchange Online (50GB)": { 
+      "category": "Email & Collaboration",
+      "description": "50 GB mailbox, custom domain, calendar sharing"
+    },
+    "Exchange Online (100GB)": { 
+      "category": "Email & Collaboration", 
+      "includes": ["Exchange Online (50GB)"],
+      "description": "100 GB mailbox + unlimited auto-expanding archive"
+    },
+    "Teams": { 
+      "category": "Email & Collaboration",
+      "description": "Chat, meetings (up to 1000 users), file sharing, PSTN optional"
+    },
+    "SharePoint Online": { 
+      "category": "Email & Collaboration",
+      "description": "1 TB base + 10 GB per user, intranet, document management"
+    },
+    "Web Apps": { 
+      "category": "Office Apps",
+      "description": "Word, Excel, PowerPoint in browser (online only)"
+    },
+    "Desktop Apps": { 
+      "category": "Office Apps", 
+      "includes": ["Web Apps"],
+      "description": "Full installable Office on up to 5 PC/Mac per user"
+    },
+    "Entra ID Plan 1": { 
+      "category": "Identity & Access",
+      "description": "SSO, MFA, Conditional Access, SSPR, hybrid identity"
+    },
+    "Entra ID Plan 2": { 
+      "category": "Identity & Access", 
+      "includes": ["Entra ID Plan 1"],
+      "description": "Plan 1 + Identity Protection (risk-based CA), PIM, access reviews"
+    },
+    "Defender for Business": { 
+      "category": "Endpoint Security",
+      "description": "Next-gen AV, EDR, attack surface reduction — optimized for SMB (<300 users)"
+    },
+    "Defender for Endpoint Plan 2": { 
+      "category": "Endpoint Security", 
+      "includes": ["Defender for Business"],
+      "description": "Enterprise EDR, threat & vulnerability management, automated IR"
+    },
+    "Defender for Identity": { 
+      "category": "Identity Security",
+      "description": "Detects lateral movement, pass-the-hash, DCSync attacks in AD/AAD"
+    },
+    "Information Protection": { 
+      "category": "Data Security",
+      "description": "Sensitivity labels, DLP for email/files, Azure Information Protection P1"
+    },
+    "Microsoft Intune": { 
+      "category": "Device Management",
+      "description": "MDM + MAM for Windows, macOS, iOS, Android — policy enforcement"
+    },
+    "Windows 11 Enterprise E3": { 
+      "category": "Device Management",
+      "description": "OS upgrade rights, Universal Print, Credential Guard, AppLocker"
+    },
+    "Windows 11 Enterprise E5": { 
+      "category": "Device Management", 
+      "includes": ["Windows 11 Enterprise E3"],
+      "description": "E3 + Defender for Endpoint deep integration, WDAC"
+    },
+    "Purview Audit (Premium)": { 
+      "category": "Compliance & Audit",
+      "description": "1-year audit log retention, high-value event access, forensic export"
+    },
+    "Microsoft Sentinel (basic)": { 
+      "category": "Compliance & Audit",
+      "description": "Included data connectors for M365 sources in Sentinel SIEM"
+    },
+    "Phone System": { 
+      "category": "Email & Collaboration",
+      "description": "Cloud PBX capabilities in Teams (requires Calling Plan add-on for PSTN)"
+    }
+  }
+}
