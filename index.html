@@ -116,4 +116,137 @@
                 textContainer.className = "flex flex-col";
                 
                 const spanMain = document.createElement('span');
-                spanMain.className = "text-gray-800 text-sm font
+                spanMain.className = "text-gray-800 text-sm font-bold leading-tight";
+                spanMain.innerText = feature;
+                textContainer.appendChild(spanMain);
+                
+                if (featureMeta[feature].description) {
+                    const spanDesc = document.createElement('span');
+                    spanDesc.className = "text-xs text-gray-500 mt-1 leading-snug";
+                    spanDesc.innerText = featureMeta[feature].description;
+                    textContainer.appendChild(spanDesc);
+                }
+                
+                const spanSub = document.createElement('span');
+                spanSub.className = "text-xs font-semibold text-blue-600 mt-1 hidden included-hint";
+                spanSub.innerText = "Included in higher-tier plan";
+                textContainer.appendChild(spanSub);
+
+                label.appendChild(checkbox);
+                label.appendChild(textContainer);
+                grid.appendChild(label);
+            });
+
+            block.appendChild(grid);
+            categoriesContainer.appendChild(block);
+        }
+    }
+
+    function handleSelection(featureValue, isChecked) {
+        if (isChecked) {
+            if (!selectedFeatures.includes(featureValue)) {
+                selectedFeatures.push(featureValue);
+            }
+        } else {
+            selectedFeatures = selectedFeatures.filter(f => f !== featureValue);
+        }
+        
+        updateLocks();
+        calculatePlans();
+    }
+
+    function updateLocks() {
+        // Unlock all first
+        document.querySelectorAll('.feature-checkbox').forEach(cb => {
+            cb.disabled = false;
+            const label = cb.closest('label');
+            label.classList.remove('opacity-60', 'bg-gray-100', 'cursor-not-allowed');
+            label.classList.add('cursor-pointer', 'bg-white');
+            label.querySelector('.included-hint').classList.add('hidden');
+        });
+
+        let lockedFeatures = new Set();
+        selectedFeatures.forEach(sf => {
+            if (featureMeta[sf] && featureMeta[sf].includes) {
+                featureMeta[sf].includes.forEach(inc => lockedFeatures.add(inc));
+            }
+        });
+
+        // Apply locks
+        lockedFeatures.forEach(lf => {
+            const cb = document.querySelector(`input[value="${lf}"]`);
+            if (cb) {
+                cb.checked = false; 
+                cb.disabled = true; 
+                
+                const label = cb.closest('label');
+                label.classList.remove('cursor-pointer', 'bg-white', 'hover:bg-blue-50');
+                label.classList.add('opacity-60', 'bg-gray-100', 'cursor-not-allowed');
+                label.querySelector('.included-hint').classList.remove('hidden');
+                
+                selectedFeatures = selectedFeatures.filter(f => f !== lf);
+            }
+        });
+    }
+
+    function calculatePlans() {
+        const seats = parseInt(seatsInput.value) || 0;
+
+        if (selectedFeatures.length === 0) {
+            resultsArea.innerHTML = '<p class="text-sm text-gray-500 italic bg-gray-50 p-3 rounded border border-dashed border-gray-300">Select features on the left to see matching plans.</p>';
+            return;
+        }
+
+        let matchingPlans = plansData.filter(plan => {
+            return selectedFeatures.every(feature => plan.features.includes(feature));
+        });
+
+        matchingPlans.sort((a, b) => a.price - b.price);
+        resultsArea.innerHTML = '';
+
+        if (matchingPlans.length === 0) {
+            resultsArea.innerHTML = `
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded shadow-sm">
+                    <p class="text-sm text-red-700 font-bold">No single plan includes all selected features.</p>
+                    <p class="text-xs text-red-600 mt-1">Consider combining plans or purchasing Add-ons separately.</p>
+                </div>`;
+            return;
+        }
+
+        matchingPlans.forEach((plan, index) => {
+            const monthlyTotal = (plan.price * seats).toFixed(2);
+            const annualTotal = (plan.price * seats * 12).toFixed(2);
+            const isBestValue = index === 0; 
+            const borderClass = isBestValue ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50';
+            const badge = isBestValue ? '<span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded ml-2 uppercase tracking-wider shadow-sm">Best Value</span>' : '';
+
+            const planCard = document.createElement('div');
+            planCard.className = `border-2 p-4 rounded-lg ${borderClass} shadow-sm transition-all`;
+            planCard.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="font-bold text-gray-900 text-lg flex items-center">${plan.name} ${badge}</h4>
+                </div>
+                <div class="text-sm text-gray-600 mb-3 font-medium">Price per user: $${plan.price.toFixed(2)}/mo</div>
+                <div class="bg-white p-3 rounded border border-gray-200 shadow-inner">
+                    <div class="flex justify-between items-center text-sm mb-2">
+                        <span class="text-gray-500">Monthly total (${seats} seats):</span>
+                        <span class="font-bold text-blue-700 text-base">$${monthlyTotal}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm border-t border-gray-100 pt-2">
+                        <span class="text-gray-500">Annual total:</span>
+                        <span class="font-bold text-gray-800">$${annualTotal}</span>
+                    </div>
+                </div>
+            `;
+            resultsArea.appendChild(planCard);
+        });
+    }
+
+    seatsInput.addEventListener('input', calculatePlans);
+    
+    // Start the process
+    loadData();
+</script>
+
+</body>
+</html>
