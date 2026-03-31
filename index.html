@@ -1,43 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M365 Defender & License Advisor</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./css/style.css">
-</head>
-<body>
-
 <header class="header">
     <div class="logo">D</div>
-    <span class="header-title">M365 Defender & License Advisor</span>
+    <span class="header-title">M365 Defender Advisor</span>
     <div class="header-pill">Decision Support</div>
 </header>
 
 <div class="layout">
     <div class="left">
-        <div class="step-label">Step 1 — Select Defender Protection Vectors</div>
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="step-label" style="margin-bottom: 12px; border:none;">Step 1 — Organization Size</div>
+            <div class="seats-row" style="display:flex; gap:15px; align-items:center;">
+                <input type="number" id="seats" value="50" min="1" class="seats-field" style="max-width: 150px;">
+                <div class="seats-label">Users in scope.<br><small id="seat-status">Currently evaluating Business & Enterprise plans.</small></div>
+            </div>
+        </div>
+
+        <div class="step-label">Step 2 — Select Required Capabilities</div>
         <div id="defender-cats"></div>
     </div>
     
     <div class="right">
-        <div class="step-label">Step 2 — Configuration & Estimation</div>
-        <div class="card">
-            <div class="card-head">👥 Organization Size</div>
-            <div class="card-body">
-                <input type="number" id="seats" value="50" min="1" class="seats-field">
-                <div class="seats-label">Users in scope</div>
-                <div id="seats-warn" class="seats-alert">⚠ Business plans are capped at 300 users. Switching to Enterprise only.</div>
-            </div>
-        </div>
+        <div class="step-label">Step 3 — Recommended Licensing & Add-ons</div>
         <div id="results">
-            </div>
+            <div class="empty-state">Enter seat count and select features to see cost-optimized plans.</div>
+        </div>
     </div>
 </div>
-
-<script src="./js/data.js"></script>
-<script src="./js/engine.js"></script>
-</body>
-</html>
