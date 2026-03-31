@@ -3,250 +3,1026 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M365 License Finder</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>M365 License Advisor — CISO Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --bg2: #161b22;
+            --bg3: #1c2128;
+            --border: #30363d;
+            --border-bright: #484f58;
+            --text: #e6edf3;
+            --text-muted: #7d8590;
+            --text-dim: #484f58;
+            --blue: #388bfd;
+            --blue-dim: #1f4068;
+            --green: #3fb950;
+            --green-dim: #1a3a24;
+            --yellow: #d29922;
+            --yellow-dim: #3a2e0e;
+            --red: #f85149;
+            --red-dim: #3a1414;
+            --purple: #a371f7;
+            --purple-dim: #2a1f4a;
+            --orange: #f0883e;
+            --font-main: 'IBM Plex Sans', sans-serif;
+            --font-mono: 'IBM Plex Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            font-size: 14px;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .header {
+            border-bottom: 1px solid var(--border);
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--bg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            font-family: var(--font-mono);
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .header-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .header-badge {
+            margin-left: auto;
+            background: var(--blue-dim);
+            border: 1px solid var(--blue);
+            color: var(--blue);
+            font-size: 11px;
+            font-family: var(--font-mono);
+            padding: 3px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* MAIN LAYOUT */
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 0;
+            min-height: calc(100vh - 73px);
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .section-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--blue);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        /* CATEGORY BLOCKS */
+        .category-block {
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .category-title {
+            background: var(--bg3);
+            padding: 10px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cat-icon {
+            font-size: 14px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--border);
+        }
+
+        .feature-item {
+            background: var(--bg2);
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            position: relative;
+        }
+
+        .feature-item:hover:not(.locked) {
+            background: var(--bg3);
+        }
+
+        .feature-item.checked {
+            background: color-mix(in srgb, var(--blue-dim) 60%, var(--bg2));
+        }
+
+        .feature-item.locked {
+            opacity: 0.45;
+            cursor: not-allowed;
+            background: var(--bg);
+        }
+
+        .feature-checkbox {
+            width: 16px;
+            height: 16px;
+            border: 1.5px solid var(--border-bright);
+            border-radius: 3px;
+            background: transparent;
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .feature-item.checked .feature-checkbox {
+            background: var(--blue);
+            border-color: var(--blue);
+        }
+
+        .feature-item.checked .feature-checkbox::after {
+            content: '✓';
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .feature-info {}
+
+        .feature-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        .feature-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 3px;
+            line-height: 1.4;
+        }
+
+        .included-badge {
+            font-size: 10px;
+            color: var(--green);
+            font-family: var(--font-mono);
+            margin-top: 4px;
+            display: none;
+        }
+
+        .feature-item.locked .included-badge {
+            display: block;
+        }
+
+        /* RIGHT PANEL */
+        .right-panel {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: var(--bg);
+        }
+
+        /* SEATS INPUT */
+        .config-block {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .config-header {
+            background: var(--bg3);
+            padding: 10px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .config-body {
+            padding: 14px 16px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .seats-input {
+            flex: 1;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 20px;
+            font-weight: 600;
+            padding: 8px 12px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .seats-input:focus {
+            border-color: var(--blue);
+        }
+
+        .seats-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .seats-warning {
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--yellow);
+            font-family: var(--font-mono);
+            display: none;
+        }
+
+        /* ALERT BOX */
+        .alert {
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 12px;
+            line-height: 1.5;
+            display: flex;
+            gap: 8px;
+        }
+
+        .alert-warn {
+            background: var(--yellow-dim);
+            border: 1px solid var(--yellow);
+            color: var(--yellow);
+        }
+
+        .alert-err {
+            background: var(--red-dim);
+            border: 1px solid var(--red);
+            color: var(--red);
+        }
+
+        .alert-info {
+            background: var(--blue-dim);
+            border: 1px solid var(--blue);
+            color: var(--blue);
+        }
+
+        /* PLAN CARDS */
+        .plan-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .plan-card.best {
+            border-color: var(--blue);
+        }
+
+        .plan-card-header {
+            padding: 12px 16px;
+            background: var(--bg3);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .plan-card.best .plan-card-header {
+            background: var(--blue-dim);
+        }
+
+        .plan-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .plan-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 5px;
+        }
+
+        .badge {
+            font-size: 10px;
+            font-family: var(--font-mono);
+            padding: 2px 7px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 600;
+        }
+
+        .badge-best {
+            background: var(--blue);
+            color: white;
+        }
+
+        .badge-enterprise {
+            background: var(--purple-dim);
+            border: 1px solid var(--purple);
+            color: var(--purple);
+        }
+
+        .badge-business {
+            background: var(--green-dim);
+            border: 1px solid var(--green);
+            color: var(--green);
+        }
+
+        .badge-warn {
+            background: var(--yellow-dim);
+            border: 1px solid var(--yellow);
+            color: var(--yellow);
+        }
+
+        .plan-price-block {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .plan-price {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .plan-price-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .plan-card-body {
+            padding: 12px 16px;
+        }
+
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+        }
+
+        .totals-row + .totals-row {
+            border-top: 1px solid var(--border);
+        }
+
+        .totals-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .totals-value {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .totals-value.highlight {
+            color: var(--blue);
+            font-size: 16px;
+        }
+
+        /* SECURITY SCORE */
+        .security-bar {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .security-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .security-bar-label span:last-child {
+            font-family: var(--font-mono);
+            color: var(--text);
+        }
+
+        .bar-track {
+            height: 6px;
+            background: var(--bg3);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+
+        /* COMPLIANCE TAGS */
+        .compliance-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .compliance-title {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 7px;
+        }
+
+        .compliance-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .comp-tag {
+            font-size: 10px;
+            font-family: var(--font-mono);
+            padding: 2px 7px;
+            border-radius: 3px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .comp-tag.highlight {
+            background: var(--green-dim);
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        /* SLA */
+        .sla-row {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+        }
+
+        .sla-label { color: var(--text-muted); }
+
+        .sla-value {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: var(--green);
+        }
+
+        /* PLAN NOTES */
+        .plan-notes {
+            margin-top: 10px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 8px 10px;
+            background: var(--bg);
+            border-radius: 4px;
+            border-left: 2px solid var(--border-bright);
+        }
+
+        /* ADD-ONS SECTION */
+        .addons-section {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .addons-header {
+            background: var(--bg3);
+            padding: 10px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .addon-item {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .addon-item:last-child { border-bottom: none; }
+
+        .addon-info {}
+
+        .addon-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .addon-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        .addon-req {
+            font-size: 10px;
+            font-family: var(--font-mono);
+            color: var(--orange);
+            margin-top: 3px;
+        }
+
+        .addon-price {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            opacity: 0.4;
+        }
+
+        .empty-text {
+            font-size: 13px;
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+
+        /* LOADING */
+        .loading-state {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        @media (max-width: 900px) {
+            .main { grid-template-columns: 1fr; }
+            .right-panel { border-top: 1px solid var(--border); }
+            .features-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
+<body>
 
-<div class="max-w-6xl mx-auto py-10 px-5">
-    <h1 class="text-3xl font-bold text-blue-600 mb-2">M365 License Finder</h1>
-    <p class="text-gray-600 mb-8">Select the features you need, and we will find the optimal plan considering license hierarchy.</p>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <h2 class="text-xl font-semibold mb-4 border-b pb-2">1. Select Required Services</h2>
-            <div id="loading-message" class="text-blue-600 font-medium py-4">Loading database...</div>
-            <div id="error-message" class="text-red-600 font-medium py-4 hidden"></div>
-            
-            <div id="categories-container" class="space-y-6 hidden">
-                </div>
+<header class="header">
+    <div class="header-logo">
+        <div class="logo-icon">M</div>
+        <div>
+            <div class="header h1" style="font-size:17px;font-weight:600;letter-spacing:-0.3px">M365 License Advisor</div>
+            <div class="header-sub">CISO Decision Support Tool</div>
         </div>
+    </div>
+    <div class="header-badge">Enterprise Grade</div>
+</header>
 
-        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100 h-fit sticky top-5">
-            <h2 class="text-xl font-semibold mb-4 border-b pb-2">2. Calculator</h2>
-            
-            <label class="block text-sm font-medium text-gray-700 mb-1">Number of users (Seats):</label>
-            <input type="number" id="seats-input" value="10" min="1" class="w-full border border-gray-300 rounded-md p-2 mb-6 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow">
+<div class="main">
 
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">Suitable Plans:</h3>
-            <div id="results-area" class="space-y-4">
-                <p class="text-sm text-gray-500 italic bg-gray-50 p-3 rounded border border-dashed border-gray-300">Select features on the left to see matching plans.</p>
+    <!-- LEFT: FEATURE SELECTOR -->
+    <div class="left-panel">
+        <div class="section-header">
+            <div class="section-num">1</div>
+            <div class="section-title">Select Required Services & Security Controls</div>
+        </div>
+        <div id="loading-state" class="loading-state">Loading license database…</div>
+        <div id="error-state" class="alert alert-err" style="display:none"></div>
+        <div id="categories-container" style="display:none"></div>
+    </div>
+
+    <!-- RIGHT: CALCULATOR + RESULTS -->
+    <div class="right-panel">
+
+        <!-- SEATS CONFIG -->
+        <div>
+            <div class="section-header" style="margin-bottom:12px">
+                <div class="section-num">2</div>
+                <div class="section-title">Organization Size & Results</div>
+            </div>
+            <div class="config-block">
+                <div class="config-header">User Count (Seats)</div>
+                <div class="config-body">
+                    <div class="input-row">
+                        <input type="number" id="seats-input" value="50" min="1" class="seats-input">
+                        <div class="seats-label">users<br>in scope</div>
+                    </div>
+                    <div id="seats-warning" class="seats-warning">⚠ Business plans capped at 300 users — only Enterprise plans shown</div>
+                </div>
             </div>
         </div>
+
+        <!-- RESULTS -->
+        <div id="results-area">
+            <div class="empty-state">
+                <div class="empty-icon">🛡</div>
+                <div class="empty-text">Select required features to see<br>matching plans with security analysis.</div>
+            </div>
+        </div>
+
+        <!-- ADD-ONS (always visible) -->
+        <div id="addons-section" style="display:none" class="addons-section">
+            <div class="addons-header">Security & Compliance Add-ons</div>
+            <div id="addons-list"></div>
+        </div>
+
     </div>
 </div>
 
 <script>
-    let plansData = [];
-    let featureMeta = {};
-    let selectedFeatures = [];
+let plansData = [], featureMeta = {}, addonsData = [], selectedFeatures = [];
 
-    const categoriesContainer = document.getElementById('categories-container');
-    const loadingMessage = document.getElementById('loading-message');
-    const errorMessage = document.getElementById('error-message');
-    const seatsInput = document.getElementById('seats-input');
-    const resultsArea = document.getElementById('results-area');
+const categoriesContainer = document.getElementById('categories-container');
+const loadingState       = document.getElementById('loading-state');
+const errorState         = document.getElementById('error-state');
+const seatsInput         = document.getElementById('seats-input');
+const resultsArea        = document.getElementById('results-area');
+const seatsWarning       = document.getElementById('seats-warning');
+const addonsSection      = document.getElementById('addons-section');
+const addonsList         = document.getElementById('addons-list');
 
-    async function loadData() {
-        try {
-            // Anti-cache technique to force fresh JSON load
-            const cacheBuster = new Date().getTime();
-            const response = await fetch(`data.json?v=${cacheBuster}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (!data.plans || !data.featureMeta) {
-                throw new Error('Invalid JSON structure. Missing "plans" or "featureMeta" arrays.');
-            }
+const CAT_ICONS = {
+    'Email & Collaboration': '📧',
+    'Office Apps': '📄',
+    'Identity & Access': '🔑',
+    'Endpoint Security': '🛡',
+    'Identity Security': '👁',
+    'Data Security': '🔒',
+    'Device Management': '💻',
+    'Compliance & Audit': '📋'
+};
 
-            plansData = data.plans;
-            featureMeta = data.featureMeta;
-            
-            loadingMessage.classList.add('hidden');
-            categoriesContainer.classList.remove('hidden');
-            
-            renderCategories();
-        } catch (error) {
-            console.error("Loading error:", error);
-            loadingMessage.classList.add('hidden');
-            errorMessage.classList.remove('hidden');
-            errorMessage.innerHTML = `Error loading data: ${error.message}<br><span class="text-sm font-normal text-gray-600">Please check your data.json file format.</span>`;
-        }
+async function loadData() {
+    try {
+        const r = await fetch(`data.json?v=${Date.now()}`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const data = await r.json();
+        if (!data.plans || !data.featureMeta) throw new Error('Missing plans or featureMeta');
+        plansData   = data.plans;
+        featureMeta = data.featureMeta;
+        addonsData  = data.addons || [];
+        loadingState.style.display = 'none';
+        categoriesContainer.style.display = 'block';
+        renderCategories();
+        renderAddons();
+    } catch (e) {
+        loadingState.style.display = 'none';
+        errorState.style.display = 'flex';
+        errorState.textContent = `Failed to load data.json: ${e.message}`;
     }
+}
 
-    function renderCategories() {
-        const categories = {};
-        
-        Object.keys(featureMeta).forEach(featureName => {
-            const cat = featureMeta[featureName].category || "Other";
-            if (!categories[cat]) categories[cat] = [];
-            categories[cat].push(featureName);
-        });
+function renderCategories() {
+    const cats = {};
+    Object.keys(featureMeta).forEach(f => {
+        const c = featureMeta[f].category || 'Other';
+        if (!cats[c]) cats[c] = [];
+        cats[c].push(f);
+    });
 
-        for (const [categoryName, features] of Object.entries(categories)) {
-            const block = document.createElement('div');
-            block.className = "bg-gray-50 p-5 rounded-lg border border-gray-200";
-            
-            const title = document.createElement('h3');
-            title.className = "font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2 text-lg";
-            title.innerText = categoryName;
-            block.appendChild(title);
+    for (const [catName, features] of Object.entries(cats)) {
+        const block = document.createElement('div');
+        block.className = 'category-block';
 
-            const grid = document.createElement('div');
-            grid.className = "grid grid-cols-1 md:grid-cols-2 gap-3";
+        const title = document.createElement('div');
+        title.className = 'category-title';
+        title.innerHTML = `<span class="cat-icon">${CAT_ICONS[catName] || '⚙'}</span>${catName}`;
+        block.appendChild(title);
 
-            features.sort().forEach(feature => {
-                const label = document.createElement('label');
-                label.className = "flex items-start space-x-3 cursor-pointer p-3 bg-white hover:bg-blue-50 rounded-md transition-colors border border-gray-100 shadow-sm feature-label";
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = "checkbox";
-                checkbox.value = feature;
-                checkbox.className = "form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 mt-0.5 focus:ring-blue-500 feature-checkbox flex-shrink-0 cursor-pointer";
-                
-                checkbox.addEventListener('change', (e) => {
-                    handleSelection(e.target.value, e.target.checked);
-                });
+        const grid = document.createElement('div');
+        grid.className = 'features-grid';
 
-                const textContainer = document.createElement('div');
-                textContainer.className = "flex flex-col";
-                
-                const spanMain = document.createElement('span');
-                spanMain.className = "text-gray-800 text-sm font-bold leading-tight";
-                spanMain.innerText = feature;
-                textContainer.appendChild(spanMain);
-                
-                if (featureMeta[feature].description) {
-                    const spanDesc = document.createElement('span');
-                    spanDesc.className = "text-xs text-gray-500 mt-1 leading-snug";
-                    spanDesc.innerText = featureMeta[feature].description;
-                    textContainer.appendChild(spanDesc);
+        features.sort().forEach(feature => {
+            const item = document.createElement('div');
+            item.className = 'feature-item';
+            item.dataset.feature = feature;
+
+            const cb = document.createElement('div');
+            cb.className = 'feature-checkbox';
+
+            const info = document.createElement('div');
+            info.className = 'feature-info';
+
+            const name = document.createElement('div');
+            name.className = 'feature-name';
+            name.textContent = feature;
+
+            const desc = document.createElement('div');
+            desc.className = 'feature-desc';
+            desc.textContent = featureMeta[feature].description || '';
+
+            const inc = document.createElement('div');
+            inc.className = 'included-badge';
+            inc.textContent = '↳ included in selected plan';
+
+            info.appendChild(name);
+            info.appendChild(desc);
+            info.appendChild(inc);
+            item.appendChild(cb);
+            item.appendChild(info);
+            grid.appendChild(item);
+
+            item.addEventListener('click', () => {
+                if (item.classList.contains('locked')) return;
+                const isChecked = item.classList.toggle('checked');
+                cb.textContent = '';
+                if (isChecked) {
+                    if (!selectedFeatures.includes(feature)) selectedFeatures.push(feature);
+                } else {
+                    selectedFeatures = selectedFeatures.filter(f => f !== feature);
                 }
-                
-                const spanSub = document.createElement('span');
-                spanSub.className = "text-xs font-semibold text-blue-600 mt-1 hidden included-hint";
-                spanSub.innerText = "Included in higher-tier plan";
-                textContainer.appendChild(spanSub);
-
-                label.appendChild(checkbox);
-                label.appendChild(textContainer);
-                grid.appendChild(label);
+                updateLocks();
+                calculatePlans();
             });
+        });
 
-            block.appendChild(grid);
-            categoriesContainer.appendChild(block);
+        block.appendChild(grid);
+        categoriesContainer.appendChild(block);
+    }
+}
+
+function updateLocks() {
+    // Reset all
+    document.querySelectorAll('.feature-item').forEach(item => {
+        item.classList.remove('locked');
+        const cb = item.querySelector('.feature-checkbox');
+        if (!item.classList.contains('checked')) cb.textContent = '';
+    });
+
+    const locked = new Set();
+    selectedFeatures.forEach(sf => {
+        if (featureMeta[sf]?.includes) featureMeta[sf].includes.forEach(i => locked.add(i));
+    });
+
+    locked.forEach(lf => {
+        const item = document.querySelector(`.feature-item[data-feature="${CSS.escape(lf)}"]`);
+        if (item) {
+            item.classList.add('locked');
+            item.classList.remove('checked');
+            selectedFeatures = selectedFeatures.filter(f => f !== lf);
         }
+    });
+}
+
+function renderAddons() {
+    addonsData.forEach(a => {
+        const div = document.createElement('div');
+        div.className = 'addon-item';
+        div.innerHTML = `
+            <div class="addon-info">
+                <div class="addon-name">${a.name}</div>
+                <div class="addon-desc">${a.description}</div>
+                ${a.requiredPlan ? `<div class="addon-req">Requires ${a.requiredPlan}+</div>` : ''}
+            </div>
+            <div class="addon-price">+$${a.price.toFixed(2)}<br><span style="color:var(--text-muted);font-size:10px">/user/mo</span></div>
+        `;
+        addonsList.appendChild(div);
+    });
+}
+
+function getSecurityColor(score) {
+    if (score <= 3) return 'var(--red)';
+    if (score <= 5) return 'var(--yellow)';
+    if (score <= 7) return 'var(--blue)';
+    return 'var(--green)';
+}
+
+function getSecurityLabel(score) {
+    if (score <= 3) return 'Basic';
+    if (score <= 5) return 'Standard';
+    if (score <= 7) return 'Advanced';
+    return 'Maximum';
+}
+
+function calculatePlans() {
+    const seats = parseInt(seatsInput.value) || 0;
+    const isLargeOrg = seats > 300;
+
+    seatsWarning.style.display = isLargeOrg ? 'block' : 'none';
+
+    if (selectedFeatures.length === 0) {
+        resultsArea.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🛡</div>
+                <div class="empty-text">Select required features to see<br>matching plans with security analysis.</div>
+            </div>`;
+        addonsSection.style.display = 'none';
+        return;
     }
 
-    function handleSelection(featureValue, isChecked) {
-        if (isChecked) {
-            if (!selectedFeatures.includes(featureValue)) {
-                selectedFeatures.push(featureValue);
-            }
-        } else {
-            selectedFeatures = selectedFeatures.filter(f => f !== featureValue);
-        }
-        
-        updateLocks();
-        calculatePlans();
-    }
+    let matching = plansData.filter(plan => {
+        if (isLargeOrg && plan.tier === 'business') return false;
+        return selectedFeatures.every(f => plan.features.includes(f));
+    });
 
-    function updateLocks() {
-        // Unlock all first
-        document.querySelectorAll('.feature-checkbox').forEach(cb => {
-            cb.disabled = false;
-            const label = cb.closest('label');
-            label.classList.remove('opacity-60', 'bg-gray-100', 'cursor-not-allowed');
-            label.classList.add('cursor-pointer', 'bg-white');
-            label.querySelector('.included-hint').classList.add('hidden');
-        });
+    matching.sort((a, b) => a.price - b.price);
+    resultsArea.innerHTML = '';
 
-        let lockedFeatures = new Set();
-        selectedFeatures.forEach(sf => {
-            if (featureMeta[sf] && featureMeta[sf].includes) {
-                featureMeta[sf].includes.forEach(inc => lockedFeatures.add(inc));
-            }
-        });
-
-        // Apply locks
-        lockedFeatures.forEach(lf => {
-            const cb = document.querySelector(`input[value="${lf}"]`);
-            if (cb) {
-                cb.checked = false; 
-                cb.disabled = true; 
-                
-                const label = cb.closest('label');
-                label.classList.remove('cursor-pointer', 'bg-white', 'hover:bg-blue-50');
-                label.classList.add('opacity-60', 'bg-gray-100', 'cursor-not-allowed');
-                label.querySelector('.included-hint').classList.remove('hidden');
-                
-                selectedFeatures = selectedFeatures.filter(f => f !== lf);
-            }
-        });
-    }
-
-    function calculatePlans() {
-        const seats = parseInt(seatsInput.value) || 0;
-
-        if (selectedFeatures.length === 0) {
-            resultsArea.innerHTML = '<p class="text-sm text-gray-500 italic bg-gray-50 p-3 rounded border border-dashed border-gray-300">Select features on the left to see matching plans.</p>';
-            return;
-        }
-
-        let matchingPlans = plansData.filter(plan => {
-            return selectedFeatures.every(feature => plan.features.includes(feature));
-        });
-
-        matchingPlans.sort((a, b) => a.price - b.price);
-        resultsArea.innerHTML = '';
-
-        if (matchingPlans.length === 0) {
-            resultsArea.innerHTML = `
-                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded shadow-sm">
-                    <p class="text-sm text-red-700 font-bold">No single plan includes all selected features.</p>
-                    <p class="text-xs text-red-600 mt-1">Consider combining plans or purchasing Add-ons separately.</p>
-                </div>`;
-            return;
-        }
-
-        matchingPlans.forEach((plan, index) => {
-            const monthlyTotal = (plan.price * seats).toFixed(2);
-            const annualTotal = (plan.price * seats * 12).toFixed(2);
-            const isBestValue = index === 0; 
-            const borderClass = isBestValue ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50';
-            const badge = isBestValue ? '<span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded ml-2 uppercase tracking-wider shadow-sm">Best Value</span>' : '';
-
-            const planCard = document.createElement('div');
-            planCard.className = `border-2 p-4 rounded-lg ${borderClass} shadow-sm transition-all`;
-            planCard.innerHTML = `
-                <div class="flex justify-between items-center mb-2">
-                    <h4 class="font-bold text-gray-900 text-lg flex items-center">${plan.name} ${badge}</h4>
+    if (matching.length === 0) {
+        resultsArea.innerHTML = `
+            <div class="alert alert-err">
+                <div>
+                    <strong>No single plan covers all selected features.</strong><br>
+                    ${isLargeOrg ? 'Enterprise plans required for 300+ users. ' : ''}Consider combining plans or reviewing selected requirements.
                 </div>
-                <div class="text-sm text-gray-600 mb-3 font-medium">Price per user: $${plan.price.toFixed(2)}/mo</div>
-                <div class="bg-white p-3 rounded border border-gray-200 shadow-inner">
-                    <div class="flex justify-between items-center text-sm mb-2">
-                        <span class="text-gray-500">Monthly total (${seats} seats):</span>
-                        <span class="font-bold text-blue-700 text-base">$${monthlyTotal}</span>
-                    </div>
-                    <div class="flex justify-between items-center text-sm border-t border-gray-100 pt-2">
-                        <span class="text-gray-500">Annual total:</span>
-                        <span class="font-bold text-gray-800">$${annualTotal}</span>
-                    </div>
-                </div>
-            `;
-            resultsArea.appendChild(planCard);
-        });
+            </div>`;
+        addonsSection.style.display = 'block';
+        return;
     }
 
-    seatsInput.addEventListener('input', calculatePlans);
-    
-    // Start the process
-    loadData();
+    // Show seat cap warning if near limit
+    if (!isLargeOrg && seats > 250) {
+        const warn = document.createElement('div');
+        warn.className = 'alert alert-warn';
+        warn.style.marginBottom = '12px';
+        warn.innerHTML = `⚠ <strong>Approaching 300-seat limit.</strong> Business plans cap at 300 users. Plan migration to Enterprise before you hit the limit.`;
+        resultsArea.appendChild(warn);
+    }
+
+    matching.forEach((plan, i) => {
+        const isBest = i === 0;
+        const monthly = (plan.price * seats).toFixed(2);
+        const annual  = (plan.price * seats * 12).toFixed(2);
+        const secColor = getSecurityColor(plan.securityScore);
+        const secLabel = getSecurityLabel(plan.securityScore);
+        const secPct = (plan.securityScore / 10 * 100).toFixed(0);
+
+        const card = document.createElement('div');
+        card.className = `plan-card${isBest ? ' best' : ''}`;
+
+        const tierBadge = plan.tier === 'enterprise'
+            ? `<span class="badge badge-enterprise">Enterprise</span>`
+            : `<span class="badge badge-business">Business</span>`;
+
+        const bestBadge = isBest ? `<span class="badge badge-best">Best Match</span>` : '';
+
+        const maxSeatsNote = plan.maxSeats
+            ? `<span class="badge badge-warn">Max ${plan.maxSeats} users</span>`
+            : `<span style="font-size:10px;font-family:var(--font-mono);color:var(--text-muted)">No seat cap</span>`;
+
+        const compTags = plan.compliance.map(c => {
+            const highlighted = ['HIPAA eligible','FedRAMP High','FedRAMP Moderate','NIS2 aligned','ITAR eligible'].includes(c);
+            return `<span class="comp-tag${highlighted ? ' highlight' : ''}">${c}</span>`;
+        }).join('');
+
+        card.innerHTML = `
+            <div class="plan-card-header">
+                <div>
+                    <div class="plan-name">${plan.name}</div>
+                    <div class="plan-badges">
+                        ${tierBadge}${bestBadge}${maxSeatsNote}
+                    </div>
+                </div>
+                <div class="plan-price-block">
+                    <div class="plan-price">$${plan.price.toFixed(2)}</div>
+                    <div class="plan-price-sub">/user/month</div>
+                </div>
+            </div>
+            <div class="plan-card-body">
+                <div class="totals-row">
+                    <span class="totals-label">Monthly (${seats} users)</span>
+                    <span class="totals-value highlight">$${monthly}</span>
+                </div>
+                <div class="totals-row">
+                    <span class="totals-label">Annual commitment</span>
+                    <span class="totals-value">$${annual}</span>
+                </div>
+
+                <div class="security-bar">
+                    <div class="security-bar-label">
+                        <span>Security Posture</span>
+                        <span>${secLabel} (${plan.securityScore}/10)</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width:${secPct}%;background:${secColor}"></div>
+                    </div>
+                </div>
+
+                <div class="sla-row">
+                    <span class="sla-label">Microsoft SLA uptime</span>
+                    <span class="sla-value">${plan.sla}% guaranteed</span>
+                </div>
+
+                <div class="compliance-section">
+                    <div class="compliance-title">Compliance Frameworks</div>
+                    <div class="compliance-tags">${compTags}</div>
+                </div>
+
+                <div class="plan-notes">${plan.notes}</div>
+            </div>
+        `;
+
+        resultsArea.appendChild(card);
+    });
+
+    addonsSection.style.display = 'block';
+}
+
+seatsInput.addEventListener('input', calculatePlans);
+loadData();
 </script>
-
 </body>
 </html>
