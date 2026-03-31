@@ -57,3 +57,45 @@
     
     "Entra ID Plan 1": { 
       "category": "Identity & Access",
+      "description": "SSO, Multi-Factor Authentication (MFA), Conditional Access"
+    },
+    "Entra ID Plan 2": { 
+      "category": "Identity & Access", 
+      "includes": ["Entra ID Plan 1"],
+      "description": "Plan 1 + Identity Protection, Privileged Identity Management (PIM)"
+    },
+    
+    "Defender for Business": { 
+      "category": "Security",
+      "description": "Next-gen antivirus, Endpoint Detection & Response (EDR) for SMBs"
+    },
+    "Defender for Endpoint Plan 2": { 
+      "category": "Security", 
+      "includes": ["Defender for Business"],
+      "description": "Enterprise-grade EDR, automated investigation & remediation"
+    },
+    "Information Protection": { 
+      "category": "Security",
+      "description": "Data Loss Prevention (DLP), sensitivity labels for emails/files"
+    },
+    
+    "Microsoft Intune": { 
+      "category": "Device Management",
+      "description": "MDM/MAM for Windows, macOS, iOS, Android devices"
+    },
+    "Windows 11 Enterprise E3": { 
+      "category": "Device Management",
+      "description": "OS upgrade rights, Universal Print, Credential Guard"
+    },
+    "Windows 11 Enterprise E5": { 
+      "category": "Device Management", 
+      "includes": ["Windows 11 Enterprise E3"],
+      "description": "E3 + Defender for Endpoint integration"
+    },
+    
+    "Purview Audit (Premium)": { 
+      "category": "Analytics & Compliance",
+      "description": "1-year audit log retention, advanced forensics"
+    }
+  }
+}
