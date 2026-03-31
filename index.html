@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M365 Defender & License Advisor</title>
-    
+    <title>M365 Defender Advisor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
@@ -22,9 +20,12 @@
     <div class="left">
         <div class="card" style="margin-bottom: 24px;">
             <div class="step-label" style="margin-bottom: 12px; border:none;">Step 1 — Organization Size</div>
-            <div class="seats-row" style="display:flex; gap:15px; align-items:center;">
-                <input type="number" id="seats" value="50" min="1" class="seats-field" style="max-width: 150px;">
-                <div class="seats-label">Users in scope.<br><small id="seat-status">Currently evaluating Business & Enterprise plans.</small></div>
+            <div class="seats-row">
+                <input type="number" id="seats" value="50" min="1" class="seats-field">
+                <div class="seats-label">
+                    Users in scope.
+                    <small id="seat-status">Evaluating Business & Enterprise plans.</small>
+                </div>
             </div>
         </div>
 
@@ -33,7 +34,7 @@
     </div>
     
     <div class="right">
-        <div class="step-label">Step 3 — Recommended Licensing & Add-ons</div>
+        <div class="step-label">Step 3 — Recommended Licensing</div>
         <div id="results">
             <div class="empty-state">Enter seat count and select features to see cost-optimized plans.</div>
         </div>
