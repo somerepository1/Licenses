@@ -8,7 +8,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
 
-<div class="max-w-5xl mx-auto py-10 px-5">
+<div class="max-w-6xl mx-auto py-10 px-5">
     <h1 class="text-3xl font-bold text-blue-600 mb-2">M365 License Finder</h1>
     <p class="text-gray-600 mb-8">Select the features you need, and we will find the optimal plan considering license hierarchy.</p>
 
@@ -75,41 +75,53 @@
 
         for (const [categoryName, features] of Object.entries(categories)) {
             const block = document.createElement('div');
-            block.className = "bg-gray-50 p-4 rounded-lg border border-gray-100";
+            block.className = "bg-gray-50 p-4 rounded-lg border border-gray-200";
             
             const title = document.createElement('h3');
-            title.className = "font-bold text-gray-700 mb-3";
+            title.className = "font-bold text-gray-800 mb-4 border-b border-gray-200 pb-1";
             title.innerText = categoryName;
             block.appendChild(title);
 
             const grid = document.createElement('div');
-            grid.className = "grid grid-cols-1 md:grid-cols-2 gap-2";
+            // Используем grid-cols-1 или md:grid-cols-2 в зависимости от количества текста
+            grid.className = "grid grid-cols-1 md:grid-cols-2 gap-3";
 
             features.sort().forEach(feature => {
                 const label = document.createElement('label');
-                label.className = "flex items-start space-x-3 cursor-pointer p-2 hover:bg-white rounded transition-colors border border-transparent hover:border-gray-200 feature-label";
+                label.className = "flex items-start space-x-3 cursor-pointer p-3 bg-white hover:bg-blue-50 rounded-md transition-colors border border-gray-100 shadow-sm feature-label";
                 
                 const checkbox = document.createElement('input');
                 checkbox.type = "checkbox";
                 checkbox.value = feature;
-                checkbox.className = "form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 mt-0.5 focus:ring-blue-500 feature-checkbox";
+                checkbox.className = "form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 mt-0.5 focus:ring-blue-500 feature-checkbox flex-shrink-0";
                 
                 checkbox.addEventListener('change', (e) => {
                     handleSelection(e.target.value, e.target.checked);
                 });
 
                 const textContainer = document.createElement('div');
+                textContainer.className = "flex flex-col";
+                
+                // Главное название функции
                 const spanMain = document.createElement('span');
-                spanMain.className = "text-gray-800 text-sm font-medium block";
+                spanMain.className = "text-gray-800 text-sm font-bold leading-tight";
                 spanMain.innerText = feature;
-                
-                const spanSub = document.createElement('span');
-                spanSub.className = "text-xs text-gray-500 hidden included-hint";
-                spanSub.innerText = "Included in higher-tier plan";
-
                 textContainer.appendChild(spanMain);
-                textContainer.appendChild(spanSub);
                 
+                // Описание функции (если есть в JSON)
+                if (featureMeta[feature].description) {
+                    const spanDesc = document.createElement('span');
+                    spanDesc.className = "text-xs text-gray-500 mt-1 leading-snug";
+                    spanDesc.innerText = featureMeta[feature].description;
+                    textContainer.appendChild(spanDesc);
+                }
+                
+                // Предупреждение о поглощении (скрыто по умолчанию)
+                const spanSub = document.createElement('span');
+                spanSub.className = "text-xs font-semibold text-blue-600 mt-1 hidden included-hint";
+                spanSub.innerText = "Included in higher-tier plan";
+                textContainer.appendChild(spanSub);
+
                 label.appendChild(checkbox);
                 label.appendChild(textContainer);
                 grid.appendChild(label);
@@ -135,7 +147,8 @@
         document.querySelectorAll('.feature-checkbox').forEach(cb => {
             cb.disabled = false;
             const label = cb.closest('label');
-            label.classList.remove('opacity-50', 'bg-gray-200');
+            label.classList.remove('opacity-60', 'bg-gray-100', 'cursor-not-allowed');
+            label.classList.add('cursor-pointer', 'bg-white');
             label.querySelector('.included-hint').classList.add('hidden');
         });
 
@@ -149,73 +162,3 @@
         lockedFeatures.forEach(lf => {
             const cb = document.querySelector(`input[value="${lf}"]`);
             if (cb) {
-                cb.checked = false; 
-                cb.disabled = true; 
-                
-                const label = cb.closest('label');
-                label.classList.add('opacity-50', 'bg-gray-200');
-                label.querySelector('.included-hint').classList.remove('hidden');
-                
-                selectedFeatures = selectedFeatures.filter(f => f !== lf);
-            }
-        });
-    }
-
-    function calculatePlans() {
-        const seats = parseInt(seatsInput.value) || 0;
-
-        if (selectedFeatures.length === 0) {
-            resultsArea.innerHTML = '<p class="text-sm text-gray-500 italic">Select features on the left...</p>';
-            return;
-        }
-
-        let matchingPlans = plansData.filter(plan => {
-            return selectedFeatures.every(feature => plan.features.includes(feature));
-        });
-
-        matchingPlans.sort((a, b) => a.price - b.price);
-        resultsArea.innerHTML = '';
-
-        if (matchingPlans.length === 0) {
-            resultsArea.innerHTML = `
-                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                    <p class="text-sm text-red-700 font-medium">No single plan includes all selected features.</p>
-                </div>`;
-            return;
-        }
-
-        matchingPlans.forEach((plan, index) => {
-            const monthlyTotal = (plan.price * seats).toFixed(2);
-            const annualTotal = (plan.price * seats * 12).toFixed(2);
-            const isBestValue = index === 0; 
-            const borderClass = isBestValue ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50';
-            const badge = isBestValue ? '<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded ml-2">Best Value</span>' : '';
-
-            const planCard = document.createElement('div');
-            planCard.className = `border-2 p-4 rounded-lg ${borderClass}`;
-            planCard.innerHTML = `
-                <div class="flex justify-between items-center mb-2">
-                    <h4 class="font-bold text-gray-800">${plan.name} ${badge}</h4>
-                </div>
-                <div class="text-sm text-gray-600 mb-2">Price per user: $${plan.price.toFixed(2)}/mo</div>
-                <div class="bg-white p-2 rounded border border-gray-100">
-                    <div class="flex justify-between items-center text-sm mb-1">
-                        <span class="text-gray-500">Monthly total (${seats} seats):</span>
-                        <span class="font-bold text-gray-800">$${monthlyTotal}</span>
-                    </div>
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-gray-500">Annual total:</span>
-                        <span class="font-bold text-gray-800">$${annualTotal}</span>
-                    </div>
-                </div>
-            `;
-            resultsArea.appendChild(planCard);
-        });
-    }
-
-    seatsInput.addEventListener('input', calculatePlans);
-    loadData();
-</script>
-
-</body>
-</html>
